@@ -41,15 +41,18 @@ const dynamicSteps: WorkflowStep[] = [
 
   useEffect(() => {
     const checkHealth = async () => {
-      try {
-        const response = await fetch("/api/health");
-        const data = await response.json();
-        setBackendStatus(data.status === "ok" ? "Connected ✅" : "Error ❌");
-      } catch (error) {
-        console.error("Backend unreachable:", error);
-        setBackendStatus("Disconnected 🔌");
-      }
-    };
+  try {
+    // Construct the full URL
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agentrounds-production.up.railway.app";
+    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/health`);
+    
+    const data = await response.json();
+    setBackendStatus(data.status === "ok" ? "Connected ✅" : "Error ❌");
+  } catch (error) {
+    console.error("Backend unreachable:", error);
+    setBackendStatus("Disconnected 🔌");
+  }
+};
 
     checkHealth();
   }, []);
@@ -64,12 +67,12 @@ const dynamicSteps: WorkflowStep[] = [
     setLogs(prev => [...prev, "[RISK_AGENT]: Analyzing condition correlations..."]);
     
     try {
-        const response = await fetch("/api/analyze-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mockPatient)
-      });
-      
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agentrounds-production.up.railway.app";
+const response = await fetch(`${baseUrl.replace(/\/$/, "")}/analyze-risk`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(mockPatient)
+});
       const data = await response.json();
       
       // Artificial delay 2: Simulate Reasoning
