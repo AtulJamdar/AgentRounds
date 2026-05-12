@@ -5,6 +5,11 @@ from app.graph.workflow import create_graph
 
 app = FastAPI(title="Healthcare Agent Mesh")
 
+origins = [
+    "http://localhost:3000",
+    "https://agent-rounds.vercel.app", # Add your specific Vercel URL here
+]
+
 # Initialize the Multi-Agent Graph
 graph = create_graph()
 
