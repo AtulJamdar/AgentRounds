@@ -43,7 +43,7 @@ const dynamicSteps: WorkflowStep[] = [
     const checkHealth = async () => {
   try {
     // Construct the full URL
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agentrounds-production.up.railway.app";
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agent-rounds.vercel.app";
     const response = await fetch(`${baseUrl.replace(/\/$/, "")}/health`);
     
     const data = await response.json();
