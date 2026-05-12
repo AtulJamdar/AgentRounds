@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.schema import Patient 
@@ -5,11 +6,9 @@ from app.graph.workflow import create_graph
 
 app = FastAPI(title="Healthcare Agent Mesh")
 
-# 1. Define specific origins
-origins = [
-    "http://localhost:3000",
-    "https://agent-rounds.vercel.app",
-]
+# 1. Define specific origins (can be overridden by environment variable)
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,https://agent-rounds.vercel.app").split(",")
+origins = [origin.strip() for origin in origins]
 
 # Initialize the Multi-Agent Graph
 graph = create_graph()

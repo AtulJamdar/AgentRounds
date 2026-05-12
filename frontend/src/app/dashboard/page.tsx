@@ -42,8 +42,7 @@ const dynamicSteps: WorkflowStep[] = [
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-        const response = await fetch(`${baseUrl}/health`);
+        const response = await fetch("/api/health");
         const data = await response.json();
         setBackendStatus(data.status === "ok" ? "Connected ✅" : "Error ❌");
       } catch (error) {
@@ -65,8 +64,7 @@ const dynamicSteps: WorkflowStep[] = [
     setLogs(prev => [...prev, "[RISK_AGENT]: Analyzing condition correlations..."]);
     
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
-        const response = await fetch(`${baseUrl}/analyze-risk`, {
+        const response = await fetch("/api/analyze-risk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mockPatient)
