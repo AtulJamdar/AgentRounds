@@ -40,26 +40,22 @@ const dynamicSteps: WorkflowStep[] = [
   };
 
   useEffect(() => {
-  const checkHealth = async () => {
-    try {
-      // 1. HARDCODE your Railway URL here to test first
-      const railwayUrl = "https://agentrounds-production.up.railway.app";
-      
-      // 2. Use the full URL
-      const response = await fetch(`${railwayUrl}/health`);
-      
-      if (!response.ok) throw new Error("Server down");
-      
-      const data = await response.json();
-      setBackendStatus(data.status === "ok" ? "Connected ✅" : "Error ❌");
-    } catch (error) {
-      console.error("Backend unreachable:", error);
-      setBackendStatus("Disconnected 🔌");
-    }
-  };
+    const checkHealth = async () => {
+  try {
+    // Construct the full URL
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://agentrounds-production.up.railway.app";
+    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/health`);
+    
+    const data = await response.json();
+    setBackendStatus(data.status === "ok" ? "Connected ✅" : "Error ❌");
+  } catch (error) {
+    console.error("Backend unreachable:", error);
+    setBackendStatus("Disconnected 🔌");
+  }
+};
 
-  checkHealth();
-}, []);
+    checkHealth();
+  }, []);
 
   const runAnalysis = async () => {
     setIsAnalyzing(true);
