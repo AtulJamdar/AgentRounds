@@ -1,4 +1,8 @@
 "use client";
+type WorkflowStep = {
+  label: string;
+  status: "done" | "loading" | "pending";
+};
 import { PatientCard } from "@/components/PatientCard";
 import { ActivityPanel } from "@/components/ActivityPanel";
 import { WorkflowTimeline } from "@/components/WorkflowTimeline";
@@ -11,11 +15,22 @@ export default function DashboardPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [logs, setLogs] = useState<string[]>([]);
-  const mockSteps = [
-    { label: "Data Ingestion", status: "done" as const },
-    { label: "Clinical Analysis", status: "loading" as const },
-    { label: "Final Report", status: "pending" as const },
-  ];
+
+  // Define dynamic steps based on state
+const dynamicSteps: WorkflowStep[] = [
+  { 
+    label: "Data Ingestion", 
+    status: isAnalyzing ? "loading" : (analysisResult ? "done" : "done") 
+  },
+  { 
+    label: "Risk Scan", 
+    status: isAnalyzing ? "loading" : (analysisResult ? "done" : "pending") 
+  },
+  { 
+    label: "Final Report", 
+    status: analysisResult ? "done" : "pending" 
+  },
+];
 
   const mockPatient = {
     name: "John Doe",
@@ -50,7 +65,8 @@ export default function DashboardPage() {
     setLogs(prev => [...prev, "[RISK_AGENT]: Analyzing condition correlations..."]);
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/analyze-risk`, {
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
+        const response = await fetch(`${baseUrl}/analyze-risk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mockPatient)
@@ -75,7 +91,11 @@ export default function DashboardPage() {
       <div className="mb-4 text-sm font-medium">
         Backend Status: <span className={backendStatus === "Connected ✅" ? "text-green-600" : "text-red-600"}>{backendStatus}</span>
       </div>
-      <PatientCard name="Atul Jamdar" age={23} condition="Routine Checkup" />
+      <PatientCard 
+  name={mockPatient.name} 
+  age={mockPatient.age} 
+  condition={mockPatient.conditions.join(", ")} 
+/>
       <button 
           onClick={runAnalysis}
           disabled={isAnalyzing}
@@ -88,11 +108,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 border p-4 rounded-xl bg-white shadow-sm">
           <h3 className="font-bold mb-4">Workflow State</h3>
-          <WorkflowTimeline steps={mockSteps} />
+          <WorkflowTimeline steps={dynamicSteps} />
         </div>
         
         <div className="md:col-span-2">
-          <ActivityPanel logs={mockLogs} />
+          <ActivityPanel logs={logs} />
         </div>
       </div>
 
